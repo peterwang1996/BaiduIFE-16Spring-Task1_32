@@ -36,7 +36,8 @@
     
     input[type="text"],
     input[type="password"],
-    input[type="email"] {
+    input[type="email"],
+    input[type="date"] {
         height: 30px;
         width: 200px;
         border: 1px solid #ababab;
@@ -73,8 +74,11 @@
 
 <body>
     <script>
+
+
     var myForm = {
         action: '#',
+        method: 'GET',
         items: [{
             label: '姓名',
             name: 'name',
@@ -97,6 +101,17 @@
             rules: '13位数字',
             success: '格式正确',
             fail: '请输入有效的手机号码',
+            required: true
+        }, {
+            label: '生日',
+            name: 'birthday',
+            type: 'date',
+            validator: function(str) {
+                return true;
+            },
+            rules: '日期格式',
+            success: '格式正确',
+            fail: '请输入有效的生日',
             required: true
         }, {
             label: '邮箱',
@@ -124,6 +139,7 @@
             required: true
         }, {
             label: '密码确认',
+            name: 'pass-conf',
             type: 'password',
             validator: function(str) {
                 var exp = new RegExp(/^[a-z0-9_-]{8,16}$/);
@@ -146,7 +162,8 @@
             rules: '必填，与密码一致',
             success: '格式正确',
             fail: '应与密码一致',
-            required: true
+            required: true,
+            noSubmit: true
         }, {
             name: 'submit',
             type: 'submit'
@@ -162,7 +179,7 @@
     function formElementMaker(srcForm, tarFormId, index) {
         var srcFormItem = srcForm[index];
         var currentDiv = document.createElement('div');
-        currentDiv.id = tarFormId + '-' + index;
+        currentDiv.id = tarFormId + '-' + srcFormItem.name;
 
         var currentBlank;
         switch (srcFormItem.type) {
@@ -178,7 +195,7 @@
             default:
                 break;
         }
-        if (srcFormItem.name) {
+        if (srcFormItem.name && (!srcFormItem.noSubmit)) {
             currentBlank.setAttribute('name', srcFormItem.name);
         }
         if (srcFormItem.required) {
@@ -223,6 +240,7 @@
         var formToMake = document.createElement('form');
         formToMake.id = tarFormId;
         formToMake.setAttribute('action', srcForm.action);
+        formToMake.setAttribute('method', srcForm.method);
 
         for (var i = 0; i < srcForm.items.length; i++) {
             formToMake.appendChild(formElementMaker(srcForm.items, tarFormId, i));
@@ -252,7 +270,7 @@
                 }
             }
             if (!isAbleToSubmit) {
-                alert("表单不符合要求！");
+                alert('表单不符合要求！');
                 event.preventDefault();
             }
         });
